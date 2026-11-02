@@ -1,0 +1,263 @@
+{
+  "dataset": "CLINC150 plus",
+  "train_examples": 15250,
+  "validation_examples": 3100,
+  "test_examples": 5500,
+  "label_count": 151,
+  "out_of_scope_label": "oos",
+  "training_config": {
+    "seed": 42,
+    "mlp_epochs": 30,
+    "bert_checkpoint": "bert-base-uncased",
+    "bert_epochs": 2,
+    "max_length": 96,
+    "student_layers": 4,
+    "student_epochs": 3
+  },
+  "training_config_source": "command-line arguments of the evaluation run (training_config.json not found)",
+  "distillation": {
+    "teacher_layers": 12,
+    "student_layers": 4,
+    "student_init": "teacher embeddings + first N encoder layers + pooler + classifier",
+    "temperature": 2.0,
+    "alpha_soft": 0.5,
+    "loss": "alpha * T^2 * KL(teacher_soft || student_soft) + (1 - alpha) * cross_entropy(labels)"
+  },
+  "quantization": "torch.ao.quantization.quantize_dynamic, all nn.Linear layers, qint8, applied to the distilled student",
+  "latency_note": "CPU, batch size 1, one raw string per call including normalize() + tokenization + forward pass + softmax; 10 warm-ups then >=100 timed calls on the first 100 test messages",
+  "size_note": "Size on disk of the files needed to run each model; see size_includes per model.",
+  "hardware": {
+    "platform": "Windows-11-10.0.26300-SP0",
+    "processor": "Intel64 Family 6 Model 140 Stepping 1, GenuineIntel",
+    "logical_cpu_count": 8,
+    "torch_threads": 4,
+    "torch_quantized_engine": "onednn",
+    "cuda_available": false,
+    "device_used": "cpu",
+    "cpu_name": "11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz",
+    "ram_gb": 11.8,
+    "python_version": "3.12.10",
+    "torch_version": "2.9.1+cpu",
+    "scikit_learn_version": "1.9.1",
+    "transformers_version": "4.57.6",
+    "datasets_version": "4.8.5",
+    "gensim_version": "4.4.0"
+  },
+  "models": {
+    "tfidf_logistic_regression": {
+      "accuracy": 0.8229090909090909,
+      "out_of_scope_recall": 0.47,
+      "latency_ms_mean": 1.3289370000711642,
+      "latency_ms_std": 1.1343875697922963,
+      "latency_runs": 100,
+      "test_examples": 5500,
+      "size_mb": 14.349933624267578,
+      "size_includes": "classical/model.joblib (TF-IDF vocabulary + logistic regression weights)"
+    },
+    "skipgram_mean_embedding_mlp": {
+      "accuracy": 0.6356363636363637,
+      "out_of_scope_recall": 0.258,
+      "latency_ms_mean": 0.2121479986817576,
+      "latency_ms_std": 0.10703292366329054,
+      "latency_runs": 100,
+      "test_examples": 5500,
+      "size_mb": 2.3928985595703125,
+      "size_includes": "mlp/ folder (Word2Vec vectors + MLP weights)"
+    },
+    "bert_finetuned_fp32": {
+      "accuracy": 0.8427272727272728,
+      "out_of_scope_recall": 0.42,
+      "latency_ms_mean": 56.76087300002109,
+      "latency_ms_std": 9.577835643940887,
+      "latency_runs": 100,
+      "test_examples": 5500,
+      "size_mb": 419.01601791381836,
+      "size_includes": "bert/ folder (FP32 safetensors weights + config + tokenizer files)",
+      "layers": 12,
+      "parameters": 109598359
+    },
+    "bert_student_int8": {
+      "accuracy": 0.8385454545454546,
+      "out_of_scope_recall": 0.46,
+      "latency_ms_mean": 14.76300199952675,
+      "latency_ms_std": 6.950018191244202,
+      "latency_runs": 100,
+      "test_examples": 5500,
+      "size_mb": 119.71688556671143,
+      "size_includes": "student_int8/ folder (INT8 state_dict + config + tokenizer files)",
+      "layers": 4,
+      "int8_linear_layers": 26,
+      "example_errors": [
+        {
+          "text": "english to spanish for dog",
+          "true": "translate",
+          "predicted": "change_language",
+          "confidence": 0.434
+        },
+        {
+          "text": "repeat what the weather will be like",
+          "true": "transfer",
+          "predicted": "weather",
+          "confidence": 0.85
+        },
+        {
+          "text": "who set up the numbers for it",
+          "true": "timer",
+          "predicted": "oos",
+          "confidence": 0.171
+        },
+        {
+          "text": "what is the definiton of auspicious",
+          "true": "definition",
+          "predicted": "calories",
+          "confidence": 0.139
+        },
+        {
+          "text": "is there a reason beyond biology about why humans are alive",
+          "true": "meaning_of_life",
+          "predicted": "oos",
+          "confidence": 0.248
+        },
+        {
+          "text": "what's the answer to it all",
+          "true": "meaning_of_life",
+          "predicted": "what_can_i_ask_you",
+          "confidence": 0.223
+        },
+        {
+          "text": "can i purchase a vacation using this",
+          "true": "pto_request",
+          "predicted": "order",
+          "confidence": 0.199
+        },
+        {
+          "text": "vacation request information",
+          "true": "pto_request",
+          "predicted": "pto_request_status",
+          "confidence": 0.416
+        },
+        {
+          "text": "vacation request please",
+          "true": "pto_request",
+          "predicted": "pto_request_status",
+          "confidence": 0.488
+        },
+        {
+          "text": "how can i contribute to my credit score",
+          "true": "improve_credit_score",
+          "predicted": "credit_score",
+          "confidence": 0.544
+        },
+        {
+          "text": "how can i up my credit score",
+          "true": "improve_credit_score",
+          "predicted": "credit_score",
+          "confidence": 0.582
+        },
+        {
+          "text": "i have a revolving store card and defaulted so will my fico score be affected",
+          "true": "improve_credit_score",
+          "predicted": "damaged_card",
+          "confidence": 0.145
+        },
+        {
+          "text": "please speak in tagalog",
+          "true": "change_language",
+          "predicted": "translate",
+          "confidence": 0.272
+        },
+        {
+          "text": "would you understand me if i speak to you in navajo",
+          "true": "change_language",
+          "predicted": "translate",
+          "confidence": 0.473
+        },
+        {
+          "text": "can you tell me the date of my last check",
+          "true": "payday",
+          "predicted": "date",
+          "confidence": 0.392
+        },
+        {
+          "text": "when did i last collect my salary",
+          "true": "payday",
+          "predicted": "income",
+          "confidence": 0.549
+        },
+        {
+          "text": "what day will i earn my payment from work",
+          "true": "payday",
+          "predicted": "bill_due",
+          "confidence": 0.27
+        },
+        {
+          "text": "what day can i expect to receive payment on",
+          "true": "payday",
+          "predicted": "bill_due",
+          "confidence": 0.51
+        },
+        {
+          "text": "when will my payment be deposited",
+          "true": "payday",
+          "predicted": "bill_due",
+          "confidence": 0.552
+        },
+        {
+          "text": "can credit card companies expedite delivery of reissued credit cards",
+          "true": "replacement_card_duration",
+          "predicted": "damaged_card",
+          "confidence": 0.173
+        },
+        {
+          "text": "can you call the help desk line for my credit card company",
+          "true": "replacement_card_duration",
+          "predicted": "damaged_card",
+          "confidence": 0.1
+        },
+        {
+          "text": "how can i request a new credit card",
+          "true": "replacement_card_duration",
+          "predicted": "new_card",
+          "confidence": 0.679
+        },
+        {
+          "text": "what's the phone number for my credit card company",
+          "true": "replacement_card_duration",
+          "predicted": "pin_change",
+          "confidence": 0.08
+        },
+        {
+          "text": "what is amount of time it takes to get a new credit card i lost mine recently",
+          "true": "replacement_card_duration",
+          "predicted": "report_lost_card",
+          "confidence": 0.179
+        },
+        {
+          "text": "what is the time frame for sending a customer who lost their credit card a new one",
+          "true": "replacement_card_duration",
+          "predicted": "report_lost_card",
+          "confidence": 0.415
+        }
+      ]
+    }
+  },
+  "supplementary_models": {
+    "bert_student_fp32": {
+      "accuracy": 0.8467272727272728,
+      "out_of_scope_recall": 0.496,
+      "latency_ms_mean": 18.929093001352157,
+      "latency_ms_std": 2.9037159333478892,
+      "latency_runs": 100,
+      "test_examples": 5500,
+      "size_mb": 202.69693279266357,
+      "size_includes": "student/ folder (FP32 safetensors weights + config + tokenizer files)",
+      "layers": 4,
+      "parameters": 52895383
+    }
+  },
+  "run_mode": "evaluate-only (models loaded from artifacts/)",
+  "wall_clock_minutes_this_run": {
+    "evaluation": 9.65,
+    "total_this_run": 9.79
+  }
+}

@@ -1,0 +1,10 @@
+datasets>=3.0,<5
+gensim>=4.3,<5
+joblib>=1.3,<2
+numpy>=1.26,<3
+scikit-learn>=1.5,<2
+streamlit>=1.40,<2
+# torch.ao.quantization.quantize_dynamic (used for the INT8 student) is deprecated and
+# scheduled for removal in PyTorch 2.10, so the upper bound stays below 2.10.
+torch>=2.4,<2.10
+transformers>=4.45,<5

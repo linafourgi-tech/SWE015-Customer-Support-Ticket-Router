@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.py[cod]
+.streamlit/secrets.toml
+# Generated artifacts (weights, logs) stay local; only the benchmark results file is committed.
+artifacts/*
+!artifacts/results.json
+data/
+cache/
+*.log

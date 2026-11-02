@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Customer Support Ticket Router: SWE015 Use Case 2</title>
+<style>
+  @page { size: 1280px 720px; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #e9edf2; }
+  body { font-family: "Segoe UI", Calibri, Arial, sans-serif; color: #1d2733; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .slide { width: 1280px; height: 720px; position: relative; overflow: hidden; background: #ffffff;
+           padding: 44px 64px 60px; page-break-after: always; break-after: page; }
+  .slide::before { content: ""; position: absolute; left: 0; top: 0; width: 100%; height: 8px; background: #1f3a5f; }
+  @media screen { .slide { margin: 20px auto; box-shadow: 0 2px 10px rgba(0,0,0,.15); } }
+  body.single .slide { display: none; margin: 0; box-shadow: none; }
+  body.single .slide.show { display: block; }
+  .kicker { font-size: 14px; letter-spacing: .14em; text-transform: uppercase; color: #2a7f8f; font-weight: 600; }
+  h1 { font-size: 34px; color: #1f3a5f; margin: 4px 0 22px; font-weight: 600; }
+  h2 { font-size: 20px; color: #1f3a5f; margin: 0 0 8px; font-weight: 600; }
+  p, li { font-size: 19px; line-height: 1.42; }
+  ul { margin: 0; padding-left: 22px; }
+  li { margin-bottom: 7px; }
+  li::marker { color: #2a7f8f; }
+  code { font-family: Consolas, "Courier New", monospace; font-size: .9em; background: #eef2f6; padding: 1px 5px; border-radius: 3px; }
+  .footer { position: absolute; left: 64px; right: 64px; bottom: 20px; display: flex; justify-content: space-between;
+            font-size: 13px; color: #7a8796; border-top: 1px solid #dde3ea; padding-top: 8px; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+  .cols-3-2 { display: grid; grid-template-columns: 1.35fr 1fr; gap: 36px; }
+  table { border-collapse: collapse; width: 100%; font-size: 17px; }
+  th { background: #1f3a5f; color: #fff; text-align: left; padding: 9px 12px; font-weight: 600; }
+  td { padding: 8px 12px; border-bottom: 1px solid #dde3ea; vertical-align: top; }
+  tr:nth-child(even) td { background: #f6f8fa; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  tr.app td { background: #e3f1f3 !important; font-weight: 600; }
+  .callout { border-left: 5px solid #2a7f8f; background: #f0f7f8; padding: 12px 18px; font-size: 18px; line-height: 1.4; border-radius: 0 6px 6px 0; }
+  .warn { border-left-color: #b5532a; background: #fbf2ee; }
+  .note { font-size: 15px; color: #4a5866; line-height: 1.4; }
+  .tag { display: inline-block; font-size: 13px; font-weight: 700; color: #fff; background: #2a7f8f; border-radius: 4px; padding: 2px 8px; margin-right: 6px; }
+  .area { display: inline-block; width: 34px; height: 34px; line-height: 34px; text-align: center; border-radius: 50%;
+          background: #1f3a5f; color: #fff; font-weight: 700; font-size: 17px; }
+  /* title slide */
+  .title-slide { background: #1f3a5f; color: #fff; padding: 90px 90px 60px; }
+  .title-slide::before { background: #2a7f8f; height: 12px; }
+  .title-slide h1 { color: #fff; font-size: 52px; margin: 18px 0 10px; }
+  .title-slide .sub { font-size: 24px; color: #cfe3e8; margin: 0 0 54px; }
+  .title-slide .meta { font-size: 20px; line-height: 1.9; color: #fff; }
+  .title-slide .meta b { display: inline-block; width: 190px; color: #9fc9d1; font-weight: 600; }
+  .title-slide .kicker { color: #9fc9d1; }
+  .title-slide .course { position: absolute; left: 90px; bottom: 50px; font-size: 16px; color: #9fc9d1; }
+  .ph { color: #ffd58a; }
+  .flow { display: flex; align-items: stretch; gap: 0; margin: 4px 0 22px; }
+  .flow .step { flex: 1; border: 2px solid #1f3a5f; border-radius: 8px; padding: 12px 14px; font-size: 16px; line-height: 1.35; background: #f6f8fa; }
+  .flow .step b { display: block; color: #1f3a5f; font-size: 17px; margin-bottom: 4px; }
+  .flow .arrow { width: 36px; display: flex; align-items: center; justify-content: center; color: #2a7f8f; font-size: 28px; font-weight: 700; }
+  .flow .step.hl { background: #e3f1f3; border-color: #2a7f8f; }
+  svg text { font-family: "Segoe UI", Calibri, Arial, sans-serif; }
+</style>
+</head>
+<body>
+
+<!-- 1 · INTRODUCTION · Title -->
+<section class="slide title-slide">
+  <div class="kicker">SWE015 Homework · Use Case 2</div>
+  <h1>Customer Support Ticket Router</h1>
+  <p class="sub">Intent routing with a distilled, INT8-quantized BERT running on a CPU laptop</p>
+  <div class="meta">
+    <div><b>Student</b><span class="ph">[Your name]</span></div>
+    <div><b>Student ID</b><span>2305025325</span></div>
+    <div><b>Repository</b><span class="ph">[Repository URL]</span></div>
+    <div><b>Demo video</b><span class="ph">[Demo video URL]</span></div>
+  </div>
+  <div class="course">SWE015 Introduction to Large Language Models · Homework: Building an Intelligent Application</div>
+</section>
+
+<!-- 2 · INTRODUCTION · Problem -->
+<section class="slide">
+  <div class="kicker">Introduction</div>
+  <h1>Problem and goal</h1>
+  <div class="cols-3-2">
+    <div>
+      <ul>
+        <li>Support teams receive free-text messages that must reach the right queue quickly.</li>
+        <li><b>Goal:</b> classify each new message into an intent, map it to a team, and send <b>uncertain or out-of-scope</b> messages to a human agent.</li>
+        <li><b>Constraint:</b> everything runs locally on a CPU-only laptop, so the model in the app must be small and fast.</li>
+        <li><b>Approach:</b> compare a four-model ladder, from classical NLP to a fine-tuned BERT, then compress BERT by <b>knowledge distillation followed by INT8 quantization</b>.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Success criteria (measured on one held-out test set)</h2>
+      <table>
+        <tr><th>Metric</th><th>Why it matters</th></tr>
+        <tr><td>Accuracy</td><td>Correct intent → correct team</td></tr>
+        <tr><td>OOS recall</td><td>Unsupported requests must reach a human</td></tr>
+        <tr><td>Size (MB)</td><td>Fits on a laptop</td></tr>
+        <tr><td>CPU latency</td><td>Interactive response</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="footer"><span>Customer Support Ticket Router · SWE015</span><span>2 / 12</span></div>
+</section>
+
+<!-- 3 · DEVELOPMENT · Dataset and preprocessing -->
+<section class="slide">
+  <div class="kicker">Development</div>
+  <h1>Dataset and preprocessing</h1>
+  <div class="cols">
+    <div>
+      <h2>CLINC150 <code>plus</code> (Larson et al., 2019)</h2>
+      <table>
+        <tr><th>Split</th><th class="num">Messages</th><th class="num">of which <code style="background:none;color:#fff">oos</code></th></tr>
+        <tr><td>Train</td><td class="num">15,250</td><td class="num">250</td></tr>
+        <tr><td>Validation (epoch selection)</td><td class="num">3,100</td><td class="num">100</td></tr>
+        <tr><td>Test (final evaluation only)</td><td class="num">5,500</td><td class="num">1,000</td></tr>
+      </table>
+      <p style="margin:12px 0 14px">150 intents in 10 domains + 1 out-of-scope class = <b>151 labels</b>. Loaded from Hugging Face <code>clinc_oos</code>.</p>
+      <div class="callout warn"><b>Scope:</b> CLINC150 is a <b>general assistant-intent</b> dataset (banking, travel, small talk, …). It is <b>not</b> an appliance-fault dataset. The product and model-code features are rule-based and were not evaluated.</div>
+    </div>
+    <div>
+      <h2>Regex normalization (<code>src/data.py</code>)</h2>
+      <ul>
+        <li>Merge model codes before lowercasing: <code>WM-3500</code> → <code>wm3500</code></li>
+        <li>Lowercase; shorten repeated letters: <code>loooove</code> → <code>loove</code></li>
+        <li>Strip punctuation; collapse whitespace</li>
+        <li>The same function is used in training, evaluation and the app</li>
+      </ul>
+      <h2 style="margin-top:16px">Bug found and fixed in the audit</h2>
+      <p style="margin:0">The original code-merging regex also joined ordinary words to numbers (<code>send 100</code> → <code>send100</code>) in <b>646 of 23,850</b> texts (2.7%). The fixed rule only merges real model-code patterns.</p>
+    </div>
+  </div>
+  <div class="footer"><span>Customer Support Ticket Router · SWE015</span><span>3 / 12</span></div>
+</section>
+
+<!-- 4 · DEVELOPMENT · Architecture -->
+<section class="slide" style="padding-top:36px">
+  <div class="kicker">Development</div>
+  <h1 style="margin-bottom:10px">System architecture</h1>
+  <svg viewBox="0 0 1200 522" width="1160" height="505" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#4a5866"/>
+      </marker>
+      <marker id="ahT" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#2a7f8f"/>
+      </marker>
+    </defs>
+    <style>
+      .lane { fill: #f6f8fa; stroke: #c9d3de; stroke-width: 1.5; }
+      .lanet { font-size: 14px; font-weight: 700; fill: #2a7f8f; letter-spacing: .06em; }
+      .b { fill: #ffffff; stroke: #1f3a5f; stroke-width: 1.6; }
+      .bh { fill: #e3f1f3; stroke: #2a7f8f; stroke-width: 2.4; }
+      .bd { fill: #fff8ec; stroke: #b5832a; stroke-width: 1.6; }
+      .t1 { font-size: 15px; font-weight: 600; fill: #1f3a5f; text-anchor: middle; }
+      .t2 { font-size: 12.5px; fill: #4a5866; text-anchor: middle; }
+      .ln { fill: none; stroke: #4a5866; stroke-width: 1.6; }
+      .lnT { fill: none; stroke: #2a7f8f; stroke-width: 1.8; stroke-dasharray: 6 4; }
+      .lab { font-size: 12.5px; fill: #4a5866; }
+    </style>
+
+    <!-- Offline lane -->
+    <rect class="lane" x="4" y="4" width="1192" height="228" rx="8"/>
+    <text class="lanet" x="18" y="26">OFFLINE TRAINING · python -m src.train · CPU</text>
+
+    <rect class="b" x="18" y="94" width="152" height="60" rx="6"/>
+    <text class="t1" x="94" y="119">CLINC150 plus</text>
+    <text class="t2" x="94" y="138">15,250 / 3,100 / 5,500</text>
+
+    <rect class="b" x="200" y="101" width="120" height="46" rx="6"/>
+    <text class="t1" x="260" y="121">normalize()</text>
+    <text class="t2" x="260" y="138">regex</text>
+
+    <rect class="b" x="355" y="40" width="205" height="40" rx="6"/>
+    <text class="t1" x="457" y="65">TF-IDF + LogReg</text>
+    <rect class="b" x="355" y="95" width="205" height="40" rx="6"/>
+    <text class="t1" x="457" y="120">Word2Vec + MLP (SGD)</text>
+    <rect class="b" x="355" y="146" width="205" height="50" rx="6"/>
+    <text class="t1" x="457" y="166">BERT teacher</text>
+    <text class="t2" x="457" y="184">bert-base-uncased · 12 layers · FP32</text>
+
+    <rect class="b" x="600" y="146" width="185" height="50" rx="6"/>
+    <text class="t1" x="692" y="166">Knowledge distillation</text>
+    <text class="t2" x="692" y="184">4-layer student · KL (T = 2) + CE</text>
+
+    <rect class="bh" x="820" y="146" width="165" height="50" rx="6"/>
+    <text class="t1" x="902" y="166">Dynamic INT8</text>
+    <text class="t2" x="902" y="184">26 Linear layers quantized</text>
+
+    <rect class="b" x="1020" y="40" width="162" height="156" rx="6"/>
+    <text class="t1" x="1101" y="72">Evaluation</text>
+    <text class="t2" x="1101" y="96">same 5,500 test messages</text>
+    <text class="t2" x="1101" y="116">accuracy · OOS recall</text>
+    <text class="t2" x="1101" y="136">size · latency (100 runs)</text>
+    <text class="t2" x="1101" y="168">→ results.json</text>
+
+    <path class="ln" d="M170,124 H198" marker-end="url(#ah)"/>
+    <path class="ln" d="M320,124 H337 V60 H353" marker-end="url(#ah)"/>
+    <path class="ln" d="M337,115 H353" marker-end="url(#ah)"/>
+    <path class="ln" d="M337,124 V171 H353" marker-end="url(#ah)"/>
+    <path class="ln" d="M560,60 H1018" marker-end="url(#ah)"/>
+    <path class="ln" d="M560,115 H1018" marker-end="url(#ah)"/>
+    <path class="ln" d="M560,171 H598" marker-end="url(#ah)"/>
+    <path class="ln" d="M785,171 H818" marker-end="url(#ah)"/>
+    <path class="ln" d="M985,171 H1018" marker-end="url(#ah)"/>
+    <path class="ln" d="M457,196 V216 H1101 V198" marker-end="url(#ah)"/>
+    <text class="lab" x="600" y="211">teacher is also evaluated</text>
+
+    <!-- Online lane -->
+    <g transform="translate(0,22)">
+    <rect class="lane" x="4" y="250" width="1192" height="246" rx="8"/>
+    <text class="lanet" x="18" y="272">APPLICATION · streamlit run app.py · local CPU</text>
+
+    <rect class="b" x="18" y="350" width="140" height="50" rx="6"/>
+    <text class="t1" x="88" y="380">Customer message</text>
+
+    <rect class="b" x="195" y="290" width="205" height="50" rx="6"/>
+    <text class="t1" x="297" y="310">Product-name correction</text>
+    <text class="t2" x="297" y="328">edit distance + model-code regex</text>
+
+    <rect class="b" x="195" y="420" width="205" height="50" rx="6"/>
+    <text class="t1" x="297" y="440">ELIZA-style rules</text>
+    <text class="t2" x="297" y="458">greetings, thanks, feelings</text>
+
+    <rect class="b" x="432" y="292" width="118" height="46" rx="6"/>
+    <text class="t1" x="491" y="320">normalize()</text>
+
+    <rect class="bh" x="585" y="290" width="200" height="50" rx="6"/>
+    <text class="t1" x="685" y="310">Distilled INT8 student</text>
+    <text class="t2" x="685" y="328">the only routing model</text>
+
+    <rect class="b" x="585" y="356" width="200" height="44" rx="6"/>
+    <text class="t2" x="685" y="374">TF-IDF · Word2Vec-MLP · teacher</text>
+    <text class="t2" x="685" y="391">side-by-side comparison only</text>
+
+    <rect class="bd" x="820" y="290" width="170" height="50" rx="6"/>
+    <text class="t1" x="905" y="310">intent = oos or</text>
+    <text class="t1" x="905" y="329">confidence &lt; 0.45?</text>
+
+    <rect class="b" x="1030" y="276" width="152" height="36" rx="6"/>
+    <text class="t1" x="1106" y="299">Human agent</text>
+    <rect class="b" x="1030" y="324" width="152" height="40" rx="6"/>
+    <text class="t1" x="1106" y="341">Team from</text>
+    <text class="t2" x="1106" y="357">intent-prefix mapping</text>
+    <rect class="b" x="1030" y="436" width="152" height="44" rx="6"/>
+    <text class="t1" x="1106" y="455">Small-talk reply</text>
+    <text class="t2" x="1106" y="472">no ticket routed</text>
+
+    <path class="ln" d="M158,375 H176 V315 H193" marker-end="url(#ah)"/>
+    <path class="ln" d="M176,375 V445 H193" marker-end="url(#ah)"/>
+    <path class="ln" d="M400,315 H430" marker-end="url(#ah)"/>
+    <path class="ln" d="M550,315 H583" marker-end="url(#ah)"/>
+    <path class="ln" d="M567,315 V378 H583" marker-end="url(#ah)"/>
+    <path class="ln" d="M785,315 H818" marker-end="url(#ah)"/>
+    <path class="ln" d="M990,305 H1008 V294 H1028" marker-end="url(#ah)"/>
+    <path class="ln" d="M1008,305 V344 H1028" marker-end="url(#ah)"/>
+    <text class="lab" x="1003" y="287" text-anchor="end">yes</text>
+    <text class="lab" x="1003" y="358" text-anchor="end">no</text>
+    <path class="ln" d="M400,432 H905 V342" marker-end="url(#ah)"/>
+    <text class="lab" x="420" y="426">reply shown, message also contains a request → still routed</text>
+    <path class="ln" d="M400,458 H1028" marker-end="url(#ah)"/>
+    <text class="lab" x="420" y="452">greeting / thanks only</text>
+    </g>
+
+    <path class="lnT" d="M902,196 V252 H700 V310" marker-end="url(#ahT)"/>
+    <text class="lab" x="712" y="246" style="fill:#2a7f8f;font-weight:600">artifacts/student_int8</text>
+  </svg>
+  <div class="footer"><span>Customer Support Ticket Router · SWE015</span><span>4 / 12</span></div>
+</section>
+
+<!-- 5 · DEVELOPMENT · Technique map -->
+<section class="slide">
+  <div class="kicker">Development</div>
+  <h1>Technique map: the four required areas</h1>
+  <table style="font-size:17.5px">
+    <tr><th style="width:70px">Area</th><th style="width:220px">Topic</th><th>Technique in this project</th><th style="width:300px">Code</th></tr>
+    <tr><td><span class="area">A</span></td><td><b>Neural networks</b></td><td>Skip-gram Word2Vec (100-d, trained on CLINC train texts), mean-pooled sentence vectors → MLP 100→128→151 (ReLU, dropout), <b>SGD + momentum, backpropagation</b></td><td><code>train.py: train_mlp</code><br><code>models.py: MeanEmbeddingMLP</code></td></tr>
+    <tr><td><span class="area">B</span></td><td><b>Classical NLP</b></td><td>Regex normalization and model-code extraction · Levenshtein edit-distance product-name correction · ELIZA-style small-talk rules with pronoun reflection · <b>TF-IDF (1–2-grams) + logistic regression</b></td><td><code>data.py</code><br><code>app.py: edit_distance, small_talk_reply</code></td></tr>
+    <tr><td><span class="area">C</span></td><td><b>Transformers</b></td><td>Fine-tuned <code>bert-base-uncased</code> sequence classifier (12 layers, hidden 768, 151 labels)</td><td><code>train.py: train_models</code></td></tr>
+    <tr><td><span class="area">D</span></td><td><b>Efficient models</b></td><td><b>Knowledge distillation</b> into a 4-layer BERT student, <b>then dynamic INT8 quantization</b> of the student; the app loads this model</td><td><code>train.py: create_student_model, train_student</code><br><code>models.py: quantize_int8</code></td></tr>
+  </table>
+  <div class="footer"><span>Customer Support Ticket Router · SWE015</span><span>5 / 12</span></div>
+</section>
+
+<!-- 6 · DEVELOPMENT · Model ladder -->
+<section class="slide">
+  <div class="kicker">Development</div>
+  <h1>Four-model ladder and training setup</h1>
+  <table>
+    <tr><th style="width:40px">#</th><th style="width:300px">Model</th><th>Training configuration</th></tr>
+    <tr><td>1</td><td><b>TF-IDF + logistic regression</b></td><td>1–2-grams, min_df 2, sublinear TF · LBFGS, C = 4</td></tr>
+    <tr><td>2</td><td><b>Word2Vec + MLP</b></td><td>Skip-gram 100-d, window 5, 8 epochs · MLP: SGD lr 0.05, momentum 0.9, 30 epochs, best epoch by validation loss</td></tr>
+    <tr><td>3</td><td><b>BERT teacher (12 layers, FP32)</b></td><td><code>bert-base-uncased</code>, AdamW lr 2e-5, batch 32, <b>2 epochs</b>, max length 96 · validation loss 2.659 → 1.025</td></tr>
+    <tr class="app"><td>4</td><td>Distilled student, 4 layers, INT8</td><td>Initialized from the teacher · 3 epochs of distillation (validation loss 0.705 → 0.471 → 0.398) · then INT8 quantization</td></tr>
+  </table>
+  <div class="cols" style="margin-top:26px;gap:30px">
+    <div class="callout">Same seed (42), same official splits and the same normalization for every model. The test split is used only once, for the final benchmark.</div>
+    <div class="callout">Training on the laptop CPU took about 1 h 45 min in total (teacher ≈ 54 min, distillation ≈ 51 min), estimated from log and artifact file timestamps.</div>
+  </div>
+  <div class="footer"><span>Customer Support Ticket Router · SWE015</span><span>6 / 12</span></div>
+</section>
+
+<!-- 7 · DEVELOPMENT · Distillation then quantization -->
+<section class="slide">
+  <div class="kicker">Development</div>
+  <h1>Compression: distillation first, then quantization</h1>
+  <div class="flow">
+    <div class="step"><b>Teacher</b>Fine-tuned BERT · 12 layers · 109.6 M parameters · FP32</div>
+    <div class="arrow">→</div>
+    <div class="step"><b>Distilled student</b>4 layers · 52.9 M parameters · FP32</div>
+    <div class="arrow">→</div>
+    <div class="step hl"><b>INT8 student (app)</b>26 Linear layers with int8 weights</div>
+  </div>
+  <div class="cols">
+    <div>
+      <h2>Knowledge distillation (Hinton et al., 2015)</h2>
+      <ul style="font-size:18px">
+        <li>Student = teacher config with <b>4 instead of 12</b> encoder layers, initialized from the teacher's embeddings, first 4 layers, pooler and classifier</li>
+        <li>Teacher frozen (eval mode, no gradients); its logits are the soft targets</li>
+        <li>Loss = 0.5 · T² · KL(teacher ‖ student) + 0.5 · CE(label), T = 2</li>
+        <li>AdamW lr 3e-5; best validation epoch kept</li>
+        <li>Parameters about halved (2.1×): the 23.4 M-parameter word-embedding table is not reduced</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Dynamic INT8 quantization</h2>
+      <ul style="font-size:18px">
+        <li><code>torch.ao.quantization.quantize_dynamic</code> on the <b>student's</b> <code>nn.Linear</code> layers (qint8)</li>
+        <li>Weights stored as int8; activations quantized at run time; CPU engine <code>onednn</code></li>
+        <li>Saved as state_dict + config; reloading was verified to give identical logits and 26 INT8 layers</li>
+        <li>The app refuses to start if the loaded model is not smaller than the teacher or has no INT8 layers</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer"><span>Customer Support Ticket Router · SWE015</span><span>7 / 12</span></div>
+</section>
+
+<!-- 8 · DEVELOPMENT · Results -->
+<section class="slide">
+  <div class="kicker">Development</div>
+  <h1>Benchmark results (same 5,500 test messages)</h1>
+  <table style="font-size:18px">
+    <tr><th>Model</th><th class="num">Accuracy</th><th class="num">OOS recall</th><th class="num">Size (MB)</th><th class="num">Mean latency (ms) ± std</th></tr>
+    <tr><td>TF-IDF + logistic regression</td><td class="num">0.823</td><td class="num">0.470</td><td class="num">14.3</td><td class="num">1.33 ± 1.13</td></tr>
+    <tr><td>Word2Vec + MLP</td><td class="num">0.636</td><td class="num">0.258</td><td class="num">2.4</td><td class="num">0.21 ± 0.11</td></tr>
+    <tr><td>BERT teacher, 12 layers, FP32</td><td class="num">0.843</td><td class="num">0.420</td><td class="num">419.0</td><td class="num">56.76 ± 9.58</td></tr>
+    <tr class="app"><td>Distilled student, 4 layers, INT8 (app model)</td><td class="num">0.839</td><td class="num">0.460</td><td class="num">119.7</td><td class="num">14.76 ± 6.95</td></tr>
+  </table>
+  <div class="cols" style="margin-top:18px;gap:30px">
+    <div>
+      <div class="callout" style="margin-bottom:12px"><b>Teacher → INT8 student:</b> −0.4 accuracy points, 3.5× smaller on disk, 3.8× faster per message on CPU.</div>
+      <p class="note" style="margin:0"><b>Supplementary note (not one of the four ladder models):</b> the distilled student <i>before</i> quantization (FP32) reached accuracy 0.847, OOS recall 0.496, 202.7 MB, 18.93 ± 2.90 ms. So quantization cost about 0.8 accuracy points.</p>
+    </div>
+    <div class="note">
+      <b>Hardware:</b> Intel Core i7-1165G7 @ 2.80 GHz (4 cores / 8 threads), 11.8 GB RAM, CPU only (no GPU), Windows 11, Python 3.12.10, PyTorch 2.9.1+cpu (4 threads), Transformers 4.57.6.<br>
+      <b>Latency:</b> batch size 1, raw string → normalize → tokenize → forward → softmax; 10 warm-ups + 100 timed runs.<br>
+      <b>Size:</b> files needed to run the model (weights + config + tokenizer for the BERT models).<br>
+      <b>Source:</b> <code>artifacts/results.json</code>
+    </div>
+  </div>
+  <div class="footer"><span>Customer Support Ticket Router · SWE015</span><span>8 / 12</span></div>
+</section>
+
+<!-- 9 · DEVELOPMENT · App and failure examples -->
+<section class="slide">
+  <div class="kicker">Development</div>
+  <h1>Live application and real failure examples</h1>
+  <h2>Observed in the app (INT8 student, default threshold 0.45)</h2>
+  <table style="font-size:16.5px">
+    <tr><th style="width:330px">Input</th><th style="width:200px">Prediction</th><th style="width:190px">Routing</th><th>Comment</th></tr>
+    <tr><td>"hi, my card was declined at the store"</td><td><code>card_declined</code> 80.6%</td><td>Billing and payments</td><td>Greeting reply shown, request still routed</td></tr>
+    <tr><td>"My dishwaser WM-3500 is leaking water"</td><td><code>w2</code> 9.2%</td><td>Human agent</td><td>Typo fixed → "dishwasher", code <code>WM3500</code>; topic not in CLINC → low confidence → fallback works</td></tr>
+    <tr style="background:#fbf2ee"><td style="background:#fbf2ee"><b>"how do i freeze my credit card"</b></td><td style="background:#fbf2ee"><b><code>damaged_card</code> 66.4%</b></td><td style="background:#fbf2ee">General support</td><td style="background:#fbf2ee"><b>Failure:</b> wrong but confident; above the threshold, so no human sees it</td></tr>
+  </table>
+  <h2 style="margin-top:20px">Test-set errors of the INT8 student (from <code>results.json</code>)</h2>
+  <table style="font-size:16.5px">
+    <tr><th style="width:420px">Message</th><th>True label</th><th>Predicted (confidence)</th><th>Observation</th></tr>
+    <tr><td>"how can i up my credit score"</td><td><code>improve_credit_score</code></td><td><code>credit_score</code> (0.58)</td><td>Neighbouring intents confused</td></tr>
+    <tr><td>"vacation request please"</td><td><code>pto_request</code></td><td><code>pto_request_status</code> (0.49)</td><td>Neighbouring intents confused</td></tr>
+    <tr><td>"repeat what the weather will be like"</td><td><code>transfer</code></td><td><code>weather</code> (0.85)</td><td>The dataset label itself looks wrong</td></tr>
+  </table>
+  <div class="footer"><span>Customer Support Ticket Router · SWE015</span><span>9 / 12</span></div>
+</section>
+
+<!-- 10 · CONCLUSION · Conclusions -->
+<section class="slide">
+  <div class="kicker">Conclusion</div>
+  <h1>Conclusions</h1>
+  <ul style="font-size:20px">
+    <li><b>Distillation + INT8 kept almost all of the teacher's accuracy</b> (0.839 vs 0.843) with 3.5× less disk space and 3.8× lower CPU latency, so it is the right model for the CPU app.</li>
+    <li>Quantization cost about 0.8 accuracy points (supplementary FP32 student: 0.847).</li>
+    <li>The FP32 student slightly beat the 2-epoch teacher, most likely because it trained for 3 more epochs. This does <b>not</b> show that distillation beats the teacher in general.</li>
+    <li>TF-IDF + logistic regression is a strong, cheap baseline (0.823 at about 1 ms). Word2Vec + MLP is clearly the weakest model (0.636).</li>
+    <li>All four ladder models were trained and benchmarked locally on CPU with one reproducible script, and the app runs the compressed model end to end.</li>
+  </ul>
+  <div class="callout warn" style="margin-top:14px"><b>Main weakness:</b> out-of-scope recall is low for every model (0.26–0.47 across the four ladder models). Even the app model detects only 46% of out-of-scope test messages with plain argmax.</div>
+  <div class="footer"><span>Customer Support Ticket Router · SWE015</span><span>10 / 12</span></div>
+</section>
+
+<!-- 11 · CONCLUSION · Limitations and future work -->
+<section class="slide">
+  <div class="kicker">Conclusion</div>
+  <h1>Limitations and future work</h1>
+  <div class="cols">
+    <div>
+      <h2>Limitations</h2>
+      <ul style="font-size:17.5px">
+        <li><b>Low OOS recall</b> (0.26–0.47). The benchmark uses plain argmax. The app's confidence threshold adds a human fallback, but its effect was not measured, and it cannot catch confident errors (see "freeze my credit card").</li>
+        <li>The teacher trained for only 2 epochs on CPU; its validation loss was still falling.</li>
+        <li>CLINC150 is not real support-ticket data. The team mapping and product/code rules are hand-written and not evaluated (e.g. "my machines are broken" is rewritten to "my machine are broken" and tagged as a washing machine).</li>
+        <li>Latency varies with background load (TF-IDF: 0.73 ms in the training run vs 1.33 ms in the evaluation run).</li>
+        <li>The embedding table stays FP32; <code>torch.ao.quantization</code> is deprecated (removal planned for PyTorch 2.10).</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Future work</h2>
+      <ul style="font-size:17.5px">
+        <li>Tune the OOS threshold on the validation split and report the resulting OOS recall and accuracy.</li>
+        <li>Train the teacher for more epochs, then re-distill.</li>
+        <li>Evaluate on real support tickets; train a dedicated appliance-fault classifier.</li>
+        <li>Quantize the embeddings as well or migrate to <code>torchao</code>; try 2–3-layer students.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer"><span>Customer Support Ticket Router · SWE015</span><span>11 / 12</span></div>
+</section>
+
+<!-- 12 · CONCLUSION · AI usage statement -->
+<section class="slide">
+  <div class="kicker">Conclusion</div>
+  <h1>AI usage statement</h1>
+  <table style="font-size:17px">
+    <tr><th style="width:200px">Tool</th><th>How it was used</th></tr>
+    <tr><td><b>ChatGPT</b> (OpenAI)</td><td>Project planning and drafting of the initial code, as recorded in the original project README.</td></tr>
+    <tr><td><b>Claude Code</b> (Anthropic)</td><td>Auditing the repository; fixing the model-code regex bug; completing the distillation → INT8 pipeline (saving/reloading, checks, memory-safe evaluate-only mode); writing smoke and app end-to-end tests; drafting the README, project map and slides. Training and evaluation commands were launched from this tool and ran on my laptop.</td></tr>
+    <tr><td><b>My role</b></td><td>Selected Use Case 2 and set the requirements and rules for the work; reviewed the changes, outputs and results; responsible for the final submission. <span style="color:#b5532a">[Add any parts you wrote or changed yourself]</span></td></tr>
+  </table>
+  <div class="callout" style="margin-top:20px">All benchmark numbers and test outcomes were produced by running the code locally on my laptop (<code>artifacts/results.json</code>, test logs). None of them were written or invented by an AI tool.</div>
+  <div class="footer"><span>Customer Support Ticket Router · SWE015</span><span>12 / 12</span></div>
+</section>
+
+<script>
+  // Preview helper: slides.html#5 shows only slide 5 (used for screenshots).
+  (function () {
+    var n = parseInt(location.hash.slice(1), 10);
+    if (n) {
+      document.body.classList.add('single');
+      var s = document.querySelectorAll('.slide')[n - 1];
+      if (s) s.classList.add('show');
+    }
+    if (location.search.indexOf('check') >= 0) {
+      var report = [];
+      document.querySelectorAll('.slide').forEach(function (slide, i) {
+        var box = slide.getBoundingClientRect();
+        var footer = slide.querySelector('.footer');
+        var limit = footer ? footer.getBoundingClientRect().top : box.bottom;
+        slide.querySelectorAll('*').forEach(function (el) {
+          if (el.closest('.footer') || el.closest('svg') && el.tagName !== 'svg') return;
+          var r = el.getBoundingClientRect();
+          if (r.height === 0) return;
+          if (r.bottom > limit + 1 || r.right > box.right - 20 || el.scrollWidth > el.clientWidth + 1 && getComputedStyle(el).overflow === 'hidden') {
+            report.push('slide ' + (i + 1) + ': ' + el.tagName + ' "' + (el.textContent || '').trim().slice(0, 50) + '" bottom=' + Math.round(r.bottom - box.top) + ' limit=' + Math.round(limit - box.top));
+          }
+        });
+      });
+      var out = document.createElement('pre');
+      out.id = 'overflow-report';
+      out.textContent = 'SLIDES=' + document.querySelectorAll('.slide').length + '\n' + (report.length ? report.join('\n') : 'NO_OVERFLOW');
+      document.body.appendChild(out);
+    }
+  })();
+</script>
+</body>
+</html>
