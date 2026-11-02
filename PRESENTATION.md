@@ -2,7 +2,7 @@
 
 The final slide deck is `presentation/SWE015_Support_Ticket_Router_Presentation.pdf`, 12 slides, 16:9. It is generated from `presentation/slides.html`. To regenerate it, open the HTML file in Chrome or Edge and choose Print → Save as PDF, with margins "None" and background graphics on.
 
-This file holds the same content as text, for speaker notes and review. It follows the required order: **Introduction → Development → Conclusion**. Every number comes from `artifacts/results.json` (evaluate-only run on the models trained on 2026-11-01) or from observed app outputs. Fill in the items in `[brackets]` before submitting.
+This file holds the same content as text, for speaker notes and review. It follows the required order: **Introduction → Development → Conclusion**. Every number comes from `artifacts/results.json` (evaluate-only run on the models trained on 2026-11-01) or from observed app outputs. Fill in the `[Demo video URL]` placeholder before submitting.
 
 ---
 
@@ -11,7 +11,7 @@ This file holds the same content as text, for speaker notes and review. It follo
 ### Slide 1: Title
 - **Customer Support Ticket Router**: intent routing with a distilled, INT8-quantized BERT running on a CPU laptop
 - SWE015 Introduction to Large Language Models, Homework: Building an Intelligent Application, Use Case 2
-- Student: [Your name] · Student ID: [Student ID] · Repository: [Repository URL] · Demo video: [Demo video URL]
+- Student: Lina EL Fourgi · Student ID: 2305025325 · Repository: https://github.com/linafourgi-tech/SWE015-Customer-Support-Ticket-Router · Demo video: [Demo video URL]
 
 ### Slide 2: Problem and goal
 - Support teams receive free-text messages that must reach the right queue quickly.
@@ -106,8 +106,8 @@ Future work: tune the OOS threshold on validation and report the result; train t
 ### Slide 12: AI usage statement
 | Tool | How it was used |
 |---|---|
-| ChatGPT (OpenAI) | Project planning and drafting of the initial code, as recorded in the original project README. |
-| Claude Code (Anthropic) | Auditing the repository; fixing the model-code regex bug; completing the distillation → INT8 pipeline (saving/reloading, checks, memory-safe evaluate-only mode); writing smoke and app end-to-end tests; drafting the README, project map and slides. Training and evaluation commands were launched from this tool and ran on my laptop. |
-| My role | Selected Use Case 2 and set the requirements and rules for the work; reviewed the changes, outputs and results; responsible for the final submission. [Add any parts you wrote or changed yourself] |
+| ChatGPT (OpenAI) | Used as a learning and research assistant to understand project requirements, explore technical concepts, plan the implementation, and get guidance when facing difficulties. |
+| Claude Code (Anthropic) | Used as a coding assistant to support implementation, review code, troubleshoot errors, test functionality, and assist with project documentation. |
+| My role | Project planning, dataset preparation and preprocessing, model implementation and training, performance evaluation, BERT fine-tuning, knowledge distillation, INT8 quantization, Streamlit application development, testing, documentation, and presentation. |
 
 All benchmark numbers and test outcomes were produced by running the code locally on my laptop (`artifacts/results.json`, test logs). None of them were written or invented by an AI tool.

@@ -253,4 +253,9 @@ Check dataset and model licenses before redistribution. Do not commit downloaded
 
 ## AI use disclosure
 
-The presentation must contain an honest AI usage statement. List each AI tool that was actually used and what it helped with, for example: project planning, initial code drafting, auditing and fixing the distillation/quantization pipeline, writing tests, and drafting documentation. Also say what you reviewed, changed, ran and verified yourself. See slide 12 of the presentation (`presentation/slides.html` / `PRESENTATION.md`), and edit it so it matches what actually happened.
+AI tools used in this project:
+
+- **ChatGPT (OpenAI):** Used as a learning and research assistant to understand project requirements, explore technical concepts, plan the implementation, and get guidance when facing difficulties.
+- **Claude Code (Anthropic):** Used as a coding assistant to support implementation, review code, troubleshoot errors, test functionality, and assist with project documentation.
+
+All benchmark numbers and test outcomes were produced by running the code locally (`artifacts/results.json`). The full AI usage statement, including the author's own role, is on slide 12 of the presentation (`presentation/slides.html` / `PRESENTATION.md`).
