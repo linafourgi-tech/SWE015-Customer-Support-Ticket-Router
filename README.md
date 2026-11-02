@@ -14,22 +14,89 @@ The app shows all four predictions side by side, but routing decisions use only 
 - Python 3.12 (verified with 3.12.10 on Windows 11). Python 3.10/3.11 should also work with the same requirements, but they were not tested.
 - CPU only; no GPU or CUDA needed (the code always runs on `cpu`).
 - About 3 GB of free RAM for BERT fine-tuning, and about 1.5 GB of disk for artifacts plus the Hugging Face cache.
-- Internet access for the first run (downloads CLINC150 and `bert-base-uncased` from Hugging Face).
+- Internet access for setup (cloning, `pip install`, downloading the artifact archive). Training and `--evaluate-only` also need internet (they download CLINC150 and, for training, `bert-base-uncased` from Hugging Face). The app itself runs offline once the artifacts are in place.
 
 Verified package versions: PyTorch 2.9.1+cpu, Transformers 4.57.6, Datasets 4.8.5, scikit-learn 1.9.1, gensim 4.4.0, NumPy 2.5.4, Streamlit 1.66.1.
 
 PyTorch is capped below 2.10 because `torch.ao.quantization.quantize_dynamic` (used for the INT8 student) is deprecated and scheduled for removal in 2.10.
 
-## Setup (Windows PowerShell)
+## Quick start from a fresh clone (Windows PowerShell)
+
+The trained models are not stored in Git. They are published as a release asset, so the app can be run **without retraining**:
+
+- Release: https://github.com/linafourgi-tech/SWE015-Customer-Support-Ticket-Router/releases/tag/v1.0.0
+- Asset: `support-ticket-router-artifacts.zip` (723,993,557 bytes, about 690 MB)
+- SHA-256: `f4779dc3eac1c8c8775c8534593957740a646e9d3bd0ebc240ba14a4b246a210`
+
+### 1. Clone the repository
+
+```powershell
+git clone https://github.com/linafourgi-tech/SWE015-Customer-Support-Ticket-Router.git
+cd SWE015-Customer-Support-Ticket-Router
+```
+
+Run all of the following commands from this project root folder.
+
+### 2. Create and activate a virtual environment
 
 ```powershell
 py -3.12 -m venv .venv
 .\.venv\Scripts\Activate.ps1
+```
+
+If PowerShell blocks the activation script, allow scripts for the current window only and activate again:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\.venv\Scripts\Activate.ps1
+```
+
+### 3. Install the requirements
+
+```powershell
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
 If `pip` installs a CUDA build of PyTorch you do not need, you can install the CPU build first: `pip install torch==2.9.1 --index-url https://download.pytorch.org/whl/cpu`.
+
+### 4. Download the artifact archive
+
+```powershell
+$ProgressPreference = 'SilentlyContinue'   # makes Invoke-WebRequest much faster in Windows PowerShell
+Invoke-WebRequest -Uri "https://github.com/linafourgi-tech/SWE015-Customer-Support-Ticket-Router/releases/download/v1.0.0/support-ticket-router-artifacts.zip" -OutFile "support-ticket-router-artifacts.zip"
+```
+
+You can also download it in a browser from the release page and move it into the project root.
+
+### 5. Verify the SHA-256 checksum
+
+```powershell
+(Get-FileHash .\support-ticket-router-artifacts.zip -Algorithm SHA256).Hash -eq "f4779dc3eac1c8c8775c8534593957740a646e9d3bd0ebc240ba14a4b246a210"
+```
+
+This must print `True`. If it prints `False`, the download is incomplete or corrupted: delete the file and download it again. (`Get-FileHash` shows the hash in upper case; the `-eq` comparison ignores case.)
+
+### 6. Extract the archive into the project root
+
+Every path inside the ZIP already starts with `artifacts/`, so extract it **into the project root** (not into an `artifacts` folder):
+
+```powershell
+Expand-Archive -Path .\support-ticket-router-artifacts.zip -DestinationPath .
+Test-Path .\artifacts\student_int8\model_int8.pt
+```
+
+`Test-Path` must print `True`. The archive restores `artifacts/labels.json`, `artifacts/classical/`, `artifacts/mlp/`, `artifacts/bert/`, `artifacts/student/` and `artifacts/student_int8/`. It does not contain `artifacts/results.json`, which is already in the repository, so nothing committed is overwritten. After extracting, you can delete the ZIP. Git ignores both the ZIP and the extracted files.
+
+### 7. Run the app
+
+```powershell
+streamlit run app.py
+```
+
+Streamlit prints a local URL (normally http://localhost:8501) and opens it in the browser. Loading the four models takes a few seconds on the first request. To keep the app reachable only from your own computer, use `streamlit run app.py --server.address localhost`.
+
+**Offline use:** once the artifacts are extracted, the app needs no internet connection. All models, tokenizers and labels are loaded from the local `artifacts/` folder.
 
 ## Train and benchmark (one command)
 
@@ -53,7 +120,7 @@ The script:
 
 The test split is used only in step 7. Model selection (best epoch) uses the validation split only.
 
-If training finished but evaluation was interrupted (e.g. low memory), re-run only the benchmark on the saved models:
+To re-run only the benchmark on saved models (for example after downloading the release archive, or when training finished but evaluation was interrupted by low memory):
 
 ```powershell
 python -m src.train --evaluate-only
@@ -61,13 +128,19 @@ python -m src.train --evaluate-only
 
 This uses the same test split and `benchmark()` code. `results.json["run_mode"]` records which mode produced the file, and `training_config` records the training settings (from `artifacts/training_config.json` when it exists).
 
+Requirements and warnings for `--evaluate-only`:
+
+- **Internet is required.** The script downloads CLINC150 `plus` from Hugging Face to get the test split and to check that `artifacts/labels.json` matches the dataset.
+- **The complete artifact archive is required**, including `artifacts/student/` (the FP32 student). The benchmark always evaluates this supplementary model and stops with an error if the folder is missing. The app alone does not need `artifacts/student/`.
+- **It overwrites `artifacts/results.json`.** Your new latency values will differ from the committed ones, because latency depends on the machine and its load. To keep the committed file, copy it first (e.g. `Copy-Item artifacts\results.json results_original.json`) or restore it afterwards with `git checkout -- artifacts/results.json`.
+
 ## Run the application
 
 ```powershell
 streamlit run app.py
 ```
 
-The app needs the artifacts from the training command. It accepts a new customer message and:
+The app needs the artifacts from the release archive (see Quick start) or from the training command. Once they are in place, it runs offline. It accepts a new customer message and:
 
 - normalizes the text with regular expressions and extracts a product model code (e.g. `WM-3500` → `WM3500`);
 - corrects one-edit typos in product names using Levenshtein edit distance (e.g. `dishwaser` → `dishwasher`);
@@ -78,7 +151,7 @@ The app needs the artifacts from the training command. It accepts a new customer
 
 A message that contains only a greeting or thanks is answered automatically. A greeting followed by a request (e.g. "hi, my card was declined") is still classified and routed.
 
-## Artifacts (generated, not committed)
+## Artifacts (published as a release asset, not committed)
 
 | Path | Contents |
 |---|---|
@@ -91,7 +164,12 @@ A message that contains only a greeting or thanks is answered automatically. A g
 | `artifacts/results.json` | All metrics, hardware, versions, timings, example errors |
 | `artifacts/train.log` | Training log (if you redirect output there) |
 
-`artifacts/` is in `.gitignore`: model weights, logs and all other artifacts are not committed to Git. The only exception is `artifacts/results.json` (the measured benchmark, no weights), which is committed so that the reported numbers can be checked. To obtain the artifacts, run the training command above. If you host them externally for grading (e.g. a zipped `artifacts/` folder on a cloud drive), add the link here and unzip it into the project root so that `artifacts/student_int8/model_int8.pt` exists.
+`artifacts/` is in `.gitignore`: model weights, logs and all other artifacts are not committed to Git. The only exception is `artifacts/results.json` (the measured benchmark, no weights), which is committed so that the reported numbers can be checked.
+
+There are two ways to obtain the other artifacts:
+
+1. **Download** `support-ticket-router-artifacts.zip` from the [v1.0.0 release](https://github.com/linafourgi-tech/SWE015-Customer-Support-Ticket-Router/releases/tag/v1.0.0), verify its SHA-256 and extract it into the project root (Quick start steps 4–6). It contains 22 files: `labels.json` and the `classical/`, `mlp/`, `bert/`, `student/` and `student_int8/` folders listed above. These are the exact models behind the measured results. It contains no logs and no `results.json`.
+2. **Retrain** with `python -m src.train`. This takes hours on a CPU, and the new models and results will differ slightly from the published ones.
 
 ## Dataset
 
@@ -126,7 +204,7 @@ Preprocessing (`src/data.py: normalize`): lowercase, merge product model codes (
 - Hardware and software versions are written to `results.json["hardware"]`.
 - A supplementary row `bert_student_fp32` (not part of the four-model ladder) separates the effect of distillation from the effect of quantization.
 
-Measurements are machine-specific. Report the values from your own `artifacts/results.json`; nothing in this repository is a pre-filled result.
+Measurements are machine-specific. The committed `artifacts/results.json` contains the values measured on the development laptop (below). If you re-run training or `--evaluate-only`, report the values from your own `artifacts/results.json`.
 
 ### Measured results (development laptop)
 
@@ -157,7 +235,7 @@ Hardware: Intel Core i7-1165G7 @ 2.80 GHz (4 cores / 8 threads), 11.8 GB RAM, no
 - CLINC150 intents are general assistant intents, not real support tickets. The intent-to-team mapping in `app.py` is a hand-written prefix mapping and is not evaluated (e.g. `damaged_card` and `transfer` fall through to "General support").
 - OOS recall is measured with plain argmax. The app's confidence threshold sends more messages to a human agent, but this thresholded behavior is not measured by the benchmark. Confident mistakes (e.g. "how do i freeze my credit card" → `damaged_card`, 66%) still pass the threshold.
 - The teacher was fine-tuned for only 2 epochs on CPU, and its validation loss was still decreasing (2.659 → 1.025).
-- Product extraction covers a fixed list of 7 products, with one-edit typo correction for words of 5+ letters. It can over-correct (e.g. "machines" → "washing machine") and is not evaluated.
+- Product extraction covers a fixed list of 7 products, with one-edit typo correction for words of 5+ letters. It can over-correct (e.g. "my machines are broken" becomes "my machine are broken" and is tagged as a washing machine) and is not evaluated.
 - Space-separated lower-case model codes ("wm 3500") are intentionally not merged, to avoid gluing ordinary words to numbers ("send 100").
 - Dynamic quantization does not quantize the embedding table, so most of the remaining student size is FP32 embeddings.
 - Latency depends on the machine, background load and thread count; it was measured on a laptop, not a server.
