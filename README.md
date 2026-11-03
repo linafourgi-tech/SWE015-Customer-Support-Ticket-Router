@@ -44,6 +44,12 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 ```
 
+On Windows systems where the `py` launcher is not available (for example, Python installed from the Microsoft Store), create the environment with this fallback instead, then activate it the same way. Check first that `python --version` shows Python 3.12:
+
+```powershell
+python -m venv .venv
+```
+
 If PowerShell blocks the activation script, allow scripts for the current window only and activate again:
 
 ```powershell
@@ -86,7 +92,7 @@ Expand-Archive -Path .\support-ticket-router-artifacts.zip -DestinationPath .
 Test-Path .\artifacts\student_int8\model_int8.pt
 ```
 
-`Test-Path` must print `True`. The archive restores `artifacts/labels.json`, `artifacts/classical/`, `artifacts/mlp/`, `artifacts/bert/`, `artifacts/student/` and `artifacts/student_int8/`. It does not contain `artifacts/results.json`, which is already in the repository, so nothing committed is overwritten. After extracting, you can delete the ZIP. Git ignores both the ZIP and the extracted files.
+`Test-Path` must print `True`. The archive restores `artifacts/labels.json`, `artifacts/classical/`, `artifacts/mlp/`, `artifacts/bert/`, `artifacts/student/` and `artifacts/student_int8/`. It does not contain `artifacts/results.json`, which is already in the repository, so nothing committed is overwritten. The extracted files are ignored by Git (`.gitignore` excludes everything in `artifacts/` except `artifacts/results.json`). The downloaded ZIP is **not** ignored: it sits in the project root, so `git status` lists it as an untracked file. Do not commit it; delete it after extracting (for example `Remove-Item .\support-ticket-router-artifacts.zip`).
 
 ### 7. Run the app
 
@@ -106,7 +112,7 @@ python -m src.train
 
 Defaults: `--seed 42 --epochs 30 (MLP) --bert-epochs 2 --student-layers 4 --student-epochs 3 --max-length 96`.
 
-On the development laptop (Intel Core i7-1165G7, 4 cores / 8 threads, 11.8 GB RAM, no GPU), the full training run took about 1 h 45 min (estimated from log and artifact file timestamps). The committed `artifacts/results.json` comes from the later `--evaluate-only` run, so its `wall_clock_minutes_this_run` field records only that evaluation run (9.65 min of evaluation), not the timings of the training stages.
+On the development laptop (Intel Core i7-1165G7, 4 physical cores, 8 logical processors, 11.8 GB RAM, no GPU), the full training run took about 1 h 45 min (estimated from log and artifact file timestamps). The committed `artifacts/results.json` comes from the later `--evaluate-only` run, so its `wall_clock_minutes_this_run` field records only that evaluation run (9.65 min of evaluation), not the timings of the training stages.
 
 The script:
 
@@ -115,7 +121,7 @@ The script:
 3. Trains skip-gram Word2Vec on the training texts, then the MLP (SGD with momentum 0.9, lr 0.05, cross-entropy, best epoch by validation loss).
 4. Fine-tunes `bert-base-uncased` (AdamW, lr 2e-5, batch 32, best epoch by validation loss).
 5. Builds a 4-layer student from the fine-tuned teacher and trains it with knowledge distillation (see below).
-6. Applies dynamic INT8 quantization to the distilled student, saves it, **reloads it from disk** and checks that it contains INT8 Linear layers.
+6. Applies dynamic INT8 quantization to the distilled student and saves it to `artifacts/student_int8/` (INT8 state_dict, config and tokenizer). It is not reloaded at this point: the reload from disk and the check that it contains INT8 Linear layers happen at the start of its evaluation in step 7 (`load_int8` inside `evaluate_saved_models`), and the run stops with an error if no INT8 layers are found.
 7. Reloads every saved model from `artifacts/` one at a time (as the app does), evaluates it on the 5,500-example test split, frees it, and writes `artifacts/results.json`.
 
 The test split is used only in step 7. Model selection (best epoch) uses the validation split only.
@@ -218,7 +224,9 @@ From `artifacts/results.json`. Models trained on 2026-11-01 with the default set
 | **Distilled student (4 layers, INT8), used by the app** | **0.8385** | **0.460** | **119.7** | **14.76 ± 6.95** |
 | Supplementary: distilled student (FP32) | 0.8467 | 0.496 | 202.7 | 18.93 ± 2.90 |
 
-Hardware: Intel Core i7-1165G7 @ 2.80 GHz (4 cores / 8 threads), 11.8 GB RAM, no GPU, Windows 11, Python 3.12.10, PyTorch 2.9.1+cpu (4 threads, `onednn` quantized engine).
+Hardware: Intel Core i7-1165G7 @ 2.80 GHz (4 physical cores, 8 logical processors), 11.8 GB RAM, no GPU, Windows 11, Python 3.12.10, PyTorch 2.9.1+cpu (4 threads, `onednn` quantized engine).
+
+`results.json["hardware"]` records the CPU name, `logical_cpu_count: 8` (logical processors) and `torch_threads: 4` (threads PyTorch used for the benchmark). It does not record the number of physical cores; the value 4 comes from Windows (`Win32_Processor.NumberOfCores` = 4, `NumberOfLogicalProcessors` = 8) on the same laptop.
 
 ## Project structure
 
@@ -242,12 +250,34 @@ Hardware: Intel Core i7-1165G7 @ 2.80 GHz (4 cores / 8 threads), 11.8 GB RAM, no
 - `torch.ao.quantization` is deprecated; a future migration to `torchao` will be needed for PyTorch ≥ 2.10.
 - CLINC150 itself contains a few exact duplicate texts across train and test (17 after normalization). This comes from the dataset, not from data leakage in this code.
 
-## Data and model citations
+## References
 
-- Larson et al. (2019), [*An Evaluation Dataset for Intent Classification and Out-of-Scope Prediction*](https://aclanthology.org/D19-1131/), EMNLP-IJCNLP.
-- Devlin et al. (2019), *BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding*, NAACL-HLT.
-- Mikolov et al. (2013), *Efficient Estimation of Word Representations in Vector Space*.
-- Hinton, Vinyals & Dean (2015), *Distilling the Knowledge in a Neural Network*.
+Papers:
+
+- Larson, S., Mahendran, A., Peper, J. J., Clarke, C., Lee, A., Hill, P., Kummerfeld, J. K., Leach, K., Laurenzano, M. A., Tang, L., & Mars, J. (2019). An Evaluation Dataset for Intent Classification and Out-of-Scope Prediction. EMNLP-IJCNLP 2019, 1311–1316. https://aclanthology.org/D19-1131/
+- Devlin, J., Chang, M.-W., Lee, K., & Toutanova, K. (2019). BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding. NAACL-HLT 2019, 4171–4186. https://aclanthology.org/N19-1423/
+- Hinton, G., Vinyals, O., & Dean, J. (2015). Distilling the Knowledge in a Neural Network. arXiv:1503.02531. https://arxiv.org/abs/1503.02531
+- Mikolov, T., Chen, K., Corrado, G., & Dean, J. (2013). Efficient Estimation of Word Representations in Vector Space. arXiv:1301.3781. https://arxiv.org/abs/1301.3781
+- Mikolov, T., Sutskever, I., Chen, K., Corrado, G., & Dean, J. (2013). Distributed Representations of Words and Phrases and their Compositionality (negative sampling). NeurIPS 26. https://arxiv.org/abs/1310.4546
+- Weizenbaum, J. (1966). ELIZA: A Computer Program for the Study of Natural Language Communication between Man and Machine. Communications of the ACM, 9(1), 36–45. https://doi.org/10.1145/365153.365168
+- Levenshtein, V. I. (1966). Binary Codes Capable of Correcting Deletions, Insertions, and Reversals. Soviet Physics Doklady, 10(8), 707–710 (Russian original: Doklady Akademii Nauk SSSR, 163(4), 845–848, 1965). https://www.mathnet.ru/eng/dan31411
+
+Dataset and pretrained model:
+
+- CLINC150 original release (Larson et al.): https://github.com/clinc/oos-eval
+- Hugging Face dataset `clinc_oos`, configuration `plus`, revision `155b9c7` (version used): https://huggingface.co/datasets/clinc/clinc_oos/tree/155b9c710419136e17307b80d0a13e68cd46b4ec
+- Pretrained checkpoint `bert-base-uncased` (Hugging Face `google-bert/bert-base-uncased`), revision `86b5e09`: https://huggingface.co/google-bert/bert-base-uncased/tree/86b5e0934494bd15c9632b12f734a8a67f723594
+
+The revisions above are the ones in the local Hugging Face cache that was used for training and evaluation. The code loads them by name (`clinc_oos`, `bert-base-uncased`), so a new download may get a newer revision.
+
+Libraries (versions verified: see Requirements):
+
+- PyTorch: Paszke et al. (2019). PyTorch: An Imperative Style, High-Performance Deep Learning Library. NeurIPS 32. https://arxiv.org/abs/1912.01703
+- Hugging Face Transformers: Wolf et al. (2020). Transformers: State-of-the-Art Natural Language Processing. EMNLP 2020 (System Demonstrations), 38–45. https://aclanthology.org/2020.emnlp-demos.6/
+- Hugging Face Datasets: Lhoest et al. (2021). Datasets: A Community Library for Natural Language Processing. EMNLP 2021 (System Demonstrations), 175–184. https://aclanthology.org/2021.emnlp-demo.21/
+- scikit-learn: Pedregosa et al. (2011). Scikit-learn: Machine Learning in Python. JMLR, 12, 2825–2830. https://jmlr.org/papers/v12/pedregosa11a.html
+- gensim: Řehůřek, R., & Sojka, P. (2010). Software Framework for Topic Modelling with Large Corpora. LREC 2010 Workshop on New Challenges for NLP Frameworks. https://radimrehurek.com/gensim/
+- Streamlit: Streamlit (open-source app framework). https://streamlit.io/
 
 Check dataset and model licenses before redistribution. Do not commit downloaded datasets, model weights, API tokens, or local caches.
 

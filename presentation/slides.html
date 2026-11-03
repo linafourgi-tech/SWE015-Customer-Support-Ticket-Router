@@ -35,6 +35,9 @@
   .callout { border-left: 5px solid #2a7f8f; background: #f0f7f8; padding: 12px 18px; font-size: 18px; line-height: 1.4; border-radius: 0 6px 6px 0; }
   .warn { border-left-color: #b5532a; background: #fbf2ee; }
   .note { font-size: 15px; color: #4a5866; line-height: 1.4; }
+  .refs { margin-top: 10px; font-size: 11.5px; line-height: 1.32; color: #4a5866; }
+  .refs h2 { font-size: 15px; margin: 0 0 3px; }
+  .refs a { color: #2a7f8f; text-decoration: none; }
   .tag { display: inline-block; font-size: 13px; font-weight: 700; color: #fff; background: #2a7f8f; border-radius: 4px; padding: 2px 8px; margin-right: 6px; }
   .area { display: inline-block; width: 34px; height: 34px; line-height: 34px; text-align: center; border-radius: 50%;
           background: #1f3a5f; color: #fff; font-weight: 700; font-size: 17px; }
@@ -350,7 +353,7 @@
       <p class="note" style="margin:0"><b>Supplementary note (not one of the four ladder models):</b> the distilled student <i>before</i> quantization (FP32) reached accuracy 0.847, OOS recall 0.496, 202.7 MB, 18.93 ± 2.90 ms. So quantization cost about 0.8 accuracy points.</p>
     </div>
     <div class="note">
-      <b>Hardware:</b> Intel Core i7-1165G7 @ 2.80 GHz (4 cores / 8 threads), 11.8 GB RAM, CPU only (no GPU), Windows 11, Python 3.12.10, PyTorch 2.9.1+cpu (4 threads), Transformers 4.57.6.<br>
+      <b>Hardware:</b> Intel Core i7-1165G7 @ 2.80 GHz (4 physical cores, 8 logical processors), 11.8 GB RAM, CPU only (no GPU), Windows 11, Python 3.12.10, PyTorch 2.9.1+cpu (4 threads), Transformers 4.57.6.<br>
       <b>Latency:</b> batch size 1, raw string → normalize → tokenize → forward → softmax; 10 warm-ups + 100 timed runs.<br>
       <b>Size:</b> files needed to run the model (weights + config + tokenizer for the BERT models).<br>
       <b>Source:</b> <code>artifacts/results.json</code>
@@ -392,6 +395,19 @@
     <li>All four ladder models were trained and benchmarked locally on CPU with one reproducible script, and the app runs the compressed model end to end.</li>
   </ul>
   <div class="callout warn" style="margin-top:14px"><b>Main weakness:</b> out-of-scope recall is low for every model (0.26–0.47 across the four ladder models). Even the app model detects only 46% of out-of-scope test messages with plain argmax.</div>
+  <div class="refs">
+    <h2>References <span style="font-weight:400;font-size:12px;color:#7a8796">(full citations in README.md)</span></h2>
+    <div>Larson et al. (2019). An Evaluation Dataset for Intent Classification and Out-of-Scope Prediction. EMNLP-IJCNLP. <a href="https://aclanthology.org/D19-1131/">aclanthology.org/D19-1131</a></div>
+    <div>CLINC150 data: original release <a href="https://github.com/clinc/oos-eval">github.com/clinc/oos-eval</a> · version used: Hugging Face <code>clinc_oos</code> (<code>plus</code>, rev. 155b9c7) <a href="https://huggingface.co/datasets/clinc/clinc_oos/tree/155b9c710419136e17307b80d0a13e68cd46b4ec">huggingface.co/datasets/clinc/clinc_oos</a></div>
+    <div>Devlin et al. (2019). BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding. NAACL-HLT. <a href="https://aclanthology.org/N19-1423/">aclanthology.org/N19-1423</a></div>
+    <div>Checkpoint: <code>bert-base-uncased</code> (rev. 86b5e09) <a href="https://huggingface.co/google-bert/bert-base-uncased/tree/86b5e0934494bd15c9632b12f734a8a67f723594">huggingface.co/google-bert/bert-base-uncased</a></div>
+    <div>Hinton, Vinyals &amp; Dean (2015). Distilling the Knowledge in a Neural Network. <a href="https://arxiv.org/abs/1503.02531">arxiv.org/abs/1503.02531</a></div>
+    <div>Mikolov et al. (2013a). Efficient Estimation of Word Representations in Vector Space. <a href="https://arxiv.org/abs/1301.3781">arxiv.org/abs/1301.3781</a></div>
+    <div>Mikolov et al. (2013b). Distributed Representations of Words and Phrases and their Compositionality (negative sampling). NeurIPS. <a href="https://arxiv.org/abs/1310.4546">arxiv.org/abs/1310.4546</a></div>
+    <div>Weizenbaum (1966). ELIZA: A Computer Program for the Study of Natural Language Communication between Man and Machine. CACM 9(1). <a href="https://doi.org/10.1145/365153.365168">doi.org/10.1145/365153.365168</a></div>
+    <div>Levenshtein (1966). Binary Codes Capable of Correcting Deletions, Insertions, and Reversals. Soviet Physics Doklady 10(8). <a href="https://www.mathnet.ru/eng/dan31411">mathnet.ru/eng/dan31411</a></div>
+    <div>Libraries: <a href="https://arxiv.org/abs/1912.01703">PyTorch</a> (Paszke et al., 2019) · <a href="https://aclanthology.org/2020.emnlp-demos.6/">Hugging Face Transformers</a> (Wolf et al., 2020) · <a href="https://aclanthology.org/2021.emnlp-demo.21/">Hugging Face Datasets</a> (Lhoest et al., 2021) · <a href="https://jmlr.org/papers/v12/pedregosa11a.html">scikit-learn</a> (Pedregosa et al., 2011) · <a href="https://radimrehurek.com/gensim/">gensim</a> (Řehůřek &amp; Sojka, 2010) · <a href="https://streamlit.io/">Streamlit</a></div>
+  </div>
   <div class="footer"><span>Customer Support Ticket Router · SWE015</span><span>10 / 12</span></div>
 </section>
 

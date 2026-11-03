@@ -70,7 +70,7 @@ The PDF has a rendered diagram with two lanes:
 
 - Teacher → INT8 student: −0.4 accuracy points, 3.5× smaller, 3.8× faster on CPU.
 - **Supplementary note** (not one of the four ladder models): the distilled student before quantization (FP32) scored accuracy 0.847, OOS recall 0.496, 202.7 MB, 18.93 ± 2.90 ms. Quantization therefore cost about 0.8 accuracy points.
-- Hardware: Intel Core i7-1165G7 @ 2.80 GHz (4 cores / 8 threads), 11.8 GB RAM, CPU only, Windows 11, Python 3.12.10, PyTorch 2.9.1+cpu (4 threads), Transformers 4.57.6.
+- Hardware: Intel Core i7-1165G7 @ 2.80 GHz (4 physical cores, 8 logical processors), 11.8 GB RAM, CPU only, Windows 11, Python 3.12.10, PyTorch 2.9.1+cpu (4 threads), Transformers 4.57.6.
 - Latency: batch size 1, raw string → normalize → tokenize → forward → softmax; 10 warm-ups + 100 timed runs. Size = files needed to run the model.
 
 ### Slide 9: Live application and real failure examples
@@ -92,6 +92,18 @@ Test-set errors (from `results.json`): "how can i up my credit score" → `credi
 - The FP32 student beat the 2-epoch teacher, probably because it trained for 3 more epochs. This is not evidence that distillation beats teachers in general.
 - TF-IDF + LogReg is a strong, cheap baseline (0.823, about 1 ms). Word2Vec + MLP is the weakest model (0.636).
 - **Main weakness:** OOS recall is low (0.26–0.47 across the four ladder models). The app model detects only 46% of OOS test messages with plain argmax.
+
+References (shown on the same slide; full list in `README.md`):
+- Larson, S., Mahendran, A., Peper, J. J., Clarke, C., Lee, A., Hill, P., Kummerfeld, J. K., Leach, K., Laurenzano, M. A., Tang, L., & Mars, J. (2019). An Evaluation Dataset for Intent Classification and Out-of-Scope Prediction. EMNLP-IJCNLP 2019, 1311–1316. https://aclanthology.org/D19-1131/
+- Devlin, J., Chang, M.-W., Lee, K., & Toutanova, K. (2019). BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding. NAACL-HLT 2019, 4171–4186. https://aclanthology.org/N19-1423/
+- CLINC150 data: original release https://github.com/clinc/oos-eval; version used: Hugging Face `clinc_oos` (`plus`, revision 155b9c7) https://huggingface.co/datasets/clinc/clinc_oos/tree/155b9c710419136e17307b80d0a13e68cd46b4ec
+- Checkpoint: `bert-base-uncased` (revision 86b5e09) https://huggingface.co/google-bert/bert-base-uncased/tree/86b5e0934494bd15c9632b12f734a8a67f723594
+- Hinton, G., Vinyals, O., & Dean, J. (2015). Distilling the Knowledge in a Neural Network. arXiv:1503.02531. https://arxiv.org/abs/1503.02531
+- Mikolov, T., Chen, K., Corrado, G., & Dean, J. (2013). Efficient Estimation of Word Representations in Vector Space. arXiv:1301.3781. https://arxiv.org/abs/1301.3781
+- Mikolov, T., Sutskever, I., Chen, K., Corrado, G., & Dean, J. (2013). Distributed Representations of Words and Phrases and their Compositionality (negative sampling). NeurIPS 26. https://arxiv.org/abs/1310.4546
+- Weizenbaum, J. (1966). ELIZA: A Computer Program for the Study of Natural Language Communication between Man and Machine. Communications of the ACM, 9(1), 36–45. https://doi.org/10.1145/365153.365168
+- Levenshtein, V. I. (1966). Binary Codes Capable of Correcting Deletions, Insertions, and Reversals. Soviet Physics Doklady, 10(8), 707–710 (Russian original: Doklady Akademii Nauk SSSR, 163(4), 845–848, 1965). https://www.mathnet.ru/eng/dan31411
+- Libraries: PyTorch https://arxiv.org/abs/1912.01703 · Hugging Face Transformers https://aclanthology.org/2020.emnlp-demos.6/ · Hugging Face Datasets https://aclanthology.org/2021.emnlp-demo.21/ · scikit-learn https://jmlr.org/papers/v12/pedregosa11a.html · gensim https://radimrehurek.com/gensim/ · Streamlit https://streamlit.io/
 
 ### Slide 11: Limitations and future work
 Limitations:
