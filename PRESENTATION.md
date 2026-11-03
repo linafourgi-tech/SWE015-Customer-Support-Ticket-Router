@@ -2,7 +2,7 @@
 
 The final slide deck is `presentation/SWE015_Support_Ticket_Router_Presentation.pdf`, 12 slides, 16:9. It is generated from `presentation/slides.html`. To regenerate it, open the HTML file in Chrome or Edge and choose Print → Save as PDF, with margins "None" and background graphics on.
 
-This file holds the same content as text, for speaker notes and review. It follows the required order: **Introduction → Development → Conclusion**. Every number comes from `artifacts/results.json` (evaluate-only run on the models trained on 2026-11-01) or from observed app outputs. Fill in the `[Demo video URL]` placeholder before submitting.
+This file holds the same content as text, for speaker notes and review. It follows the required order: **Introduction → Development → Conclusion**. Every number comes from `artifacts/results.json` (evaluate-only run on the models trained on 2026-11-01) or from observed app outputs.
 
 ---
 
@@ -11,7 +11,7 @@ This file holds the same content as text, for speaker notes and review. It follo
 ### Slide 1: Title
 - **Customer Support Ticket Router**: intent routing with a distilled, INT8-quantized BERT running on a CPU laptop
 - SWE015 Introduction to Large Language Models, Homework: Building an Intelligent Application, Use Case 2
-- Student: Lina EL Fourgi · Student ID: 2305025325 · Repository: https://github.com/linafourgi-tech/SWE015-Customer-Support-Ticket-Router · Demo video: [Demo video URL]
+- Student: Lina EL Fourgi · Student ID: 2305025325 · Repository: https://github.com/linafourgi-tech/SWE015-Customer-Support-Ticket-Router · Demo video: https://drive.google.com/file/d/1s6Z0Zzfn0bIof7-MdqhKxEXoW3ckQh4G/view?usp=sharing
 
 ### Slide 2: Problem and goal
 - Support teams receive free-text messages that must reach the right queue quickly.
